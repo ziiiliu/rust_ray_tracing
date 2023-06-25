@@ -1,6 +1,6 @@
 use std::{ops, fmt::{Display, Formatter}};
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Vec3 {
     e: Vec<f64>,
 }
@@ -17,23 +17,23 @@ impl Vec3 {
         Self { e: vec![e1, e2, e3] }
     }
 
-    fn x(&self) -> f64 {
+    pub fn x(&self) -> f64 {
         self.e[0]
     }
 
-    fn y(&self) -> f64 {
+    pub fn y(&self) -> f64 {
         self.e[1]
     }
 
-    fn z(&self) -> f64 {
+    pub fn z(&self) -> f64 {
         self.e[2]
     }
 
-    fn length_squared(&self) -> f64 {
+    pub fn length_squared(&self) -> f64 {
         self.e[0].powf(2.0) + self.e[1].powf(2.0) + self.e[2].powf(2.0) 
     }
 
-    fn length(&self) -> f64 {
+    pub fn length(&self) -> f64 {
         self.length_squared().sqrt()
     }
 }
@@ -62,6 +62,16 @@ impl ops::Sub<Vec3> for Vec3 {
 
     fn sub(self, rhs: Vec3) -> Self::Output {
         Self {
+            e: vec![self.x() - rhs.x(), self.y() - rhs.y(), self.z() - rhs.z()]
+        }
+    }
+}
+
+impl<'a, 'b> ops::Sub<&'b Vec3> for &'a Vec3 {
+    type Output = Vec3;
+
+    fn sub(self, rhs: &'b Vec3) -> Self::Output {
+        Vec3 {
             e: vec![self.x() - rhs.x(), self.y() - rhs.y(), self.z() - rhs.z()]
         }
     }
@@ -112,7 +122,7 @@ pub fn cross(u: &Vec3, v: &Vec3) -> Vec3 {
               u.e[0] * v.e[1] - u.e[1] * v.e[0])
 }
 
-pub fn unit_vector(u: Vec3) -> Vec3 {
+pub fn unit_vector(u: &Vec3) -> Vec3 {
     u.clone() / u.length()
 }
 
