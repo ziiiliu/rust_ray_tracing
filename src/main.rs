@@ -6,9 +6,11 @@ pub mod util;
 pub mod camera;
 
 use hittable::HitRecord;
+use rand::Rng;
 use util::INF;
 use vector3::{Color, write_color, unit_vector, dot};
 use ray::Ray;
+use camera::Camera;
 
 use crate::{vector3::{Point3, Vec3}, hittable::HittableList, sphere::Sphere};
 
@@ -43,6 +45,7 @@ fn main(){
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_HEIGHT: i32 = 225;
     const IMAGE_WIDTH: i32 = (IMAGE_HEIGHT as f64 * ASPECT_RATIO) as i32;
+    const SAMPLES_PER_PIXEL: i32 = 100;
 
     // World
     let mut world = HittableList::new();
@@ -50,27 +53,23 @@ fn main(){
     world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
 
     // Camera
-    let viewport_height = 2.0;
-    let view_port_width = ASPECT_RATIO * viewport_height;
-    let focal_length = 1.0;
-
-    let origin = Point3::new(0.0,0.0,0.0);
-    let horizontal = Vec3::new(view_port_width, 0.0, 0.0);
-    let vertical = Vec3::new(0.0, viewport_height, 0.0);
-    let lower_left_corner = origin.clone() - horizontal.clone()/2.0 -vertical.clone()/2.0 - Vec3::new(0.0, 0.0, focal_length);
+    let cam = Camera::default();
 
     // Render
     println!("P3\n{IMAGE_WIDTH} {IMAGE_HEIGHT}\n255");
 
+    let mut rng  = rand::thread_rng();
+
     for j in (0..IMAGE_HEIGHT).rev() {
         for i in 0..IMAGE_WIDTH{
-            let u = (i as f64) / (IMAGE_WIDTH as f64 - 1.0);
-            let v = (j as f64) / (IMAGE_HEIGHT as f64 - 1.0);
-            let direction = lower_left_corner.clone() + horizontal.clone() * u + vertical.clone() * v - origin.clone();
-
-            let ray = Ray::new(&origin, &direction);
-            let pixel_color = ray_color(&ray, &world);
-            write_color(pixel_color);
+            let mut pixel_color = Color::new(0.0, 0.0, 0.0);
+            for s in 0..SAMPLES_PER_PIXEL {
+                let u = (i as f64 + rng.gen::<f64>()) / (IMAGE_WIDTH as f64 - 1.0);
+                let v = (j as f64 + rng.gen::<f64>()) / (IMAGE_HEIGHT as f64 - 1.0);
+                let ray = cam.get_ray(u, v);
+                pixel_color = pixel_color + ray_color(&ray, &world);
+            }
+            write_color(pixel_color, SAMPLES_PER_PIXEL);
         }
     }
 }

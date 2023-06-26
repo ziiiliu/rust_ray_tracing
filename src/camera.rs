@@ -1,6 +1,6 @@
 use crate::{vector3::{Point3, Vec3}, ray::Ray};
 
-struct Camera {
+pub struct Camera {
     origin: Point3,
     lower_left_corner: Point3,
     horizontal: Vec3,

@@ -1,5 +1,7 @@
 use std::{ops, fmt::{Display, Formatter}};
 
+use crate::util::clamp;
+
 #[derive(Clone, Default)]
 pub struct Vec3 {
     e: Vec<f64>,
@@ -126,9 +128,19 @@ pub fn unit_vector(u: &Vec3) -> Vec3 {
     u.clone() / u.length()
 }
 
-pub fn write_color(pixel_color: Color) {
-    let r = (255.999 * pixel_color.x()) as i16;
-    let g = (255.999 * pixel_color.y()) as i16;
-    let b = (255.999 * pixel_color.z()) as i16;
+pub fn write_color(pixel_color: Color, samples_per_pixel: i32) {
+    let scale = 1.0 / samples_per_pixel as f64;
+
+    let mut r = pixel_color.x();
+    let mut g = pixel_color.y();
+    let mut b = pixel_color.z();
+    
+    r = r * scale;
+    g = g * scale;
+    b = b *scale;
+
+    let r = (255.999 * clamp(r, 0.0, 0.999)) as i16;
+    let g = (255.999 * clamp(g, 0.0, 0.999)) as i16;
+    let b = (255.999 * clamp(b,0.0, 0.999)) as i16;
     println!("{r} {g} {b}")
 }
