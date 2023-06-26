@@ -4,6 +4,7 @@ pub mod hittable;
 pub mod sphere;
 pub mod util;
 pub mod camera;
+pub mod material;
 
 use hittable::HitRecord;
 use rand::Rng;
