@@ -1,5 +1,3 @@
-use std::borrow::BorrowMut;
-
 use crate::vector3::{Point3, Vec3, dot};
 use crate::ray::Ray;
 

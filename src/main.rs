@@ -7,17 +7,21 @@ pub mod camera;
 
 use hittable::HitRecord;
 use rand::Rng;
-use util::INF;
-use vector3::{Color, write_color, unit_vector, dot};
+use util::{INF, random_in_unit_sphere, random_unit_vector};
+use vector3::{Color, write_color, unit_vector};
 use ray::Ray;
 use camera::Camera;
 
-use crate::{vector3::{Point3, Vec3}, hittable::HittableList, sphere::Sphere};
+use crate::{vector3::{Point3}, hittable::HittableList, sphere::Sphere};
 
-fn ray_color(ray: &Ray, world: &HittableList) -> Color {
+fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
     let hit_record = &mut HitRecord::default();
-    if world.hit(ray, 0.0, INF, hit_record) {
-        return (Color::new(1.0, 1.0, 1.0) + hit_record.normal.clone()) * 0.5
+    if depth <= 0 {
+        return Color::new(0.0, 0.0, 0.0)
+    }
+    if world.hit(ray, 0.001, INF, hit_record) {
+        let target = hit_record.p.clone() + hit_record.normal.clone() + random_unit_vector();
+        return ray_color(&Ray::new(&hit_record.p, &(target-hit_record.p.clone())), world, depth-1) * 0.5
     }
 
     let unit_direction = unit_vector(ray.direction());
@@ -46,6 +50,7 @@ fn main(){
     const IMAGE_HEIGHT: i32 = 225;
     const IMAGE_WIDTH: i32 = (IMAGE_HEIGHT as f64 * ASPECT_RATIO) as i32;
     const SAMPLES_PER_PIXEL: i32 = 100;
+    const MAX_DEPTH: i32 = 50;
 
     // World
     let mut world = HittableList::new();
@@ -63,11 +68,11 @@ fn main(){
     for j in (0..IMAGE_HEIGHT).rev() {
         for i in 0..IMAGE_WIDTH{
             let mut pixel_color = Color::new(0.0, 0.0, 0.0);
-            for s in 0..SAMPLES_PER_PIXEL {
+            for _s in 0..SAMPLES_PER_PIXEL {
                 let u = (i as f64 + rng.gen::<f64>()) / (IMAGE_WIDTH as f64 - 1.0);
                 let v = (j as f64 + rng.gen::<f64>()) / (IMAGE_HEIGHT as f64 - 1.0);
                 let ray = cam.get_ray(u, v);
-                pixel_color = pixel_color + ray_color(&ray, &world);
+                pixel_color = pixel_color + ray_color(&ray, &world, MAX_DEPTH);
             }
             write_color(pixel_color, SAMPLES_PER_PIXEL);
         }

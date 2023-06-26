@@ -1,6 +1,6 @@
 use std::{ops, fmt::{Display, Formatter}};
 
-use crate::util::clamp;
+use crate::util::{clamp, random_f64};
 
 #[derive(Clone, Default)]
 pub struct Vec3 {
@@ -17,6 +17,10 @@ impl Vec3 {
 
     pub fn new(e1: f64, e2: f64, e3: f64) -> Self {
         Self { e: vec![e1, e2, e3] }
+    }
+
+    pub fn random(min: f64, max: f64) -> Self {
+        Self::new(random_f64(min, max), random_f64(min, max), random_f64(min, max))
     }
 
     pub fn x(&self) -> f64 {
@@ -135,9 +139,9 @@ pub fn write_color(pixel_color: Color, samples_per_pixel: i32) {
     let mut g = pixel_color.y();
     let mut b = pixel_color.z();
     
-    r = r * scale;
-    g = g * scale;
-    b = b *scale;
+    r = (r * scale).sqrt();
+    g = (g * scale).sqrt();
+    b = (b *scale).sqrt();
 
     let r = (255.999 * clamp(r, 0.0, 0.999)) as i16;
     let g = (255.999 * clamp(g, 0.0, 0.999)) as i16;
