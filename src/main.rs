@@ -8,7 +8,7 @@ pub mod material;
 
 use hittable::HitRecord;
 use rand::Rng;
-use util::{INF, random_in_unit_sphere, random_unit_vector};
+use util::{INF, random_in_unit_sphere, random_unit_vector, Interval};
 use vector3::{Color, write_color, unit_vector};
 use ray::Ray;
 use camera::Camera;
@@ -20,7 +20,7 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
     if depth <= 0 {
         return Color::new(0.0, 0.0, 0.0)
     }
-    if world.hit(ray, 0.001, INF, hit_record) {
+    if world.hit(ray, Interval::new(0.001, INF), hit_record) {
         let mut scattered: Ray;
         let mut attenuation: Color;
         if hit_record.material.unwrap().scatter(ray.clone(), hit_record, attenuation, scattered){
