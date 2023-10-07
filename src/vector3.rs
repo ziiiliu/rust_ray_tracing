@@ -42,6 +42,11 @@ impl Vec3 {
     pub fn length(&self) -> f64 {
         self.length_squared().sqrt()
     }
+
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        self.x().abs() < s && self.y().abs() < s && self.z() < s
+    } 
 }
 
 impl Display for Vec3 {
@@ -147,4 +152,8 @@ pub fn write_color(pixel_color: Color, samples_per_pixel: i32) {
     let g = (255.999 * clamp(g, 0.0, 0.999)) as i16;
     let b = (255.999 * clamp(b,0.0, 0.999)) as i16;
     println!("{r} {g} {b}")
+}
+
+pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
+    v.clone() - n.clone() * dot(v, n) * 2.0
 }

@@ -2,11 +2,11 @@ use crate::material::Material;
 use crate::vector3::{Point3, Vec3, dot};
 use crate::ray::Ray;
 
-#[derive(Default, Clone)]
+#[derive(Clone)]
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
-    pub material: Box<dyn Material>,
+    pub material: Option<Box<dyn Material>>,
     pub t: f64,
     pub front_face: bool,
 }
@@ -24,6 +24,13 @@ impl HitRecord {
         self.front_face = new_record.front_face;
     }
 }
+
+impl Default for HitRecord {
+    fn default() -> Self {
+        Self { p: Default::default(), normal: Default::default(), material: None, t: Default::default(), front_face: Default::default() }
+    }
+}
+
 
 pub trait Hittable {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64, hit_rec: &mut HitRecord) -> bool;

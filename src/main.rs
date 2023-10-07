@@ -21,8 +21,12 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
         return Color::new(0.0, 0.0, 0.0)
     }
     if world.hit(ray, 0.001, INF, hit_record) {
-        let target = hit_record.p.clone() + hit_record.normal.clone() + random_unit_vector();
-        return ray_color(&Ray::new(&hit_record.p, &(target-hit_record.p.clone())), world, depth-1) * 0.5
+        let mut scattered: Ray;
+        let mut attenuation: Color;
+        if hit_record.material.unwrap().scatter(ray.clone(), hit_record, attenuation, scattered){
+            return ray_color(&scattered, world, depth - 1) * attenuation
+        }
+        return Color::new(0.0, 0.0, 0.0)
     }
 
     let unit_direction = unit_vector(ray.direction());
