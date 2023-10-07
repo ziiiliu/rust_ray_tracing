@@ -2,8 +2,8 @@ use crate::vector3::{Vec3, unit_vector};
 
 pub const INF: f64 = f64::INFINITY;
 pub const PI: f64 = std::f64::consts::PI;
-pub const EMPTY: Interval = Interval::new(INF, -INF); 
-pub const UNIVERSE: Interval = Interval::new(-INF, INF);
+// pub const EMPTY: Interval = Interval::new(INF, -INF); 
+// pub const UNIVERSE: Interval = Interval::new(-INF, INF);
 
 pub fn degrees_to_radians(degrees: f64) -> f64 {
     degrees * PI / 180.0

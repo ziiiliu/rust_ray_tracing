@@ -22,4 +22,9 @@ impl Ray {
     pub fn at(&self, t: f64) -> Point3 {
         self.origin().clone() + self.direction().clone() * t
     }
+
+    pub fn update_as(&mut self, ray: Ray) {
+        self.origin = ray.origin;
+        self.direction = ray.direction;
+    }
 }

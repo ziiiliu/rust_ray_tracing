@@ -13,17 +13,17 @@ use vector3::{Color, write_color, unit_vector};
 use ray::Ray;
 use camera::Camera;
 
-use crate::{vector3::{Point3}, hittable::HittableList, sphere::Sphere};
+use crate::{vector3::{Point3}, hittable::HittableList, sphere::Sphere, material::{Lambertian, Metal}};
 
 fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
     let hit_record = &mut HitRecord::default();
     if depth <= 0 {
-        return Color::new(0.0, 0.0, 0.0)
+        return Color::new(0.0, 0.0,  0.0)
     }
     if world.hit(ray, Interval::new(0.001, INF), hit_record) {
-        let mut scattered: Ray;
-        let mut attenuation: Color;
-        if hit_record.material.unwrap().scatter(ray.clone(), hit_record, attenuation, scattered){
+        let scattered: &mut Ray;
+        let attenuation: &mut Color;
+        if hit_record.material.unwrap().scatter(ray.clone(), hit_record.clone(), attenuation, scattered){
             return ray_color(&scattered, world, depth - 1) * attenuation
         }
         return Color::new(0.0, 0.0, 0.0)
@@ -59,9 +59,16 @@ fn main(){
 
     // World
     let mut world = HittableList::new();
-    world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
-    world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
 
+    let material_ground = Box::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+    let material_centre = Box::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
+    let material_left = Box::new(Metal::new(Color::new(0.8, 0.8, 0.8)));
+    let material_right = Box::new(Metal::new(Color::new(0.8, 0.6, 0.2)));
+
+    world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0, material_ground)));
+    world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5, material_centre)));
+    world.add(Box::new(Sphere::new(Point3::new(-1.0, 0.0, -1.0), 0.5, material_left)));
+    world.add(Box::new(Sphere::new(Point3::new(1.0, 0.0, -1.0), 0.5, material_right)));
     // Camera
     let cam = Camera::default();
 

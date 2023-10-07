@@ -46,7 +46,11 @@ impl Vec3 {
     pub fn near_zero(&self) -> bool {
         let s = 1e-8;
         self.x().abs() < s && self.y().abs() < s && self.z() < s
-    } 
+    }
+
+    pub fn update_as(&mut self, c: Vec3) {
+        self.e = c.e
+    }
 }
 
 impl Display for Vec3 {
@@ -94,6 +98,16 @@ impl ops::Mul<f64> for Vec3 {
     fn mul(self, rhs: f64) -> Self::Output {
         Self {
             e: vec![self.x() * rhs, self.y() * rhs, self.z() * rhs]
+        }
+    }
+}
+
+impl ops::Mul<&mut Vec3> for Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, v: &mut Vec3) -> Self::Output {
+        Self {
+            e: vec![self.x() * v.x(), self.y() * v.y(), self.z() * v.z()]
         }
     }
 }
