@@ -21,9 +21,9 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
         return Color::new(0.0, 0.0,  0.0)
     }
     if world.hit(ray, Interval::new(0.001, INF), hit_record) {
-        let scattered: &mut Ray;
-        let attenuation: &mut Color;
-        if hit_record.material.unwrap().scatter(ray.clone(), hit_record.clone(), attenuation, scattered){
+        let scattered = &mut Ray::default();
+        let attenuation = &mut Color::default();
+        if hit_record.material.clone().unwrap().scatter(ray.clone(), hit_record.clone(), attenuation, scattered){
             return ray_color(&scattered, world, depth - 1) * attenuation
         }
         return Color::new(0.0, 0.0, 0.0)

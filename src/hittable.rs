@@ -23,6 +23,7 @@ impl HitRecord {
         self.normal = new_record.normal.clone();
         self.t = new_record.t;
         self.front_face = new_record.front_face;
+        self.material = new_record.material.clone();
     }
 }
 
