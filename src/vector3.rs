@@ -102,6 +102,16 @@ impl ops::Mul<f64> for Vec3 {
     }
 }
 
+impl ops::Mul<f64> for &Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Vec3 {
+            e: vec![self.x() * rhs, self.y() * rhs, self.z() * rhs]
+        }
+    }
+}
+
 impl ops::Mul<&mut Vec3> for Vec3 {
     type Output = Vec3;
 
@@ -132,6 +142,16 @@ impl ops::Neg for Vec3 {
 
     fn neg(self) -> Self::Output {
         Self{
+            e: vec![-self.x(), -self.y(), -self.z()]
+        }
+    }
+}
+
+impl<'a> ops::Neg for &'a Vec3 {
+    type Output = Vec3;
+
+    fn neg(self) -> Self::Output {
+        Vec3 {
             e: vec![-self.x(), -self.y(), -self.z()]
         }
     }
@@ -170,4 +190,11 @@ pub fn write_color(pixel_color: Color, samples_per_pixel: i32) {
 
 pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
     v.clone() - n.clone() * dot(v, n) * 2.0
+}
+
+pub fn refract(r_in: &Vec3, n: &Vec3, eta_ratio: f64) -> Vec3 { // eta_ratio is eta/eta_prime
+    let cos_theta = f64::min(dot(&-r_in, n), 1.0);
+    let r_out_perp = (r_in.clone() + n * cos_theta) * eta_ratio;
+    let r_out_parallel = n * -((1.0 - r_out_perp.length_squared()).abs()).sqrt();
+    r_out_perp + r_out_parallel
 }

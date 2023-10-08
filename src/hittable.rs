@@ -14,8 +14,8 @@ pub struct HitRecord {
 
 impl HitRecord {
     pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: Vec3) {
-        let front_face = dot(ray.direction(), &outward_normal) < 0.0;
-        self.normal = if front_face {outward_normal} else {-outward_normal};
+        self.front_face = dot(ray.direction(), &outward_normal) < 0.0;
+        self.normal = if self.front_face {outward_normal} else {-outward_normal};
     }
 
     pub fn update_as(&mut self, new_record: &HitRecord) {

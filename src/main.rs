@@ -13,7 +13,7 @@ use vector3::{Color, write_color, unit_vector};
 use ray::Ray;
 use camera::Camera;
 
-use crate::{vector3::{Point3}, hittable::HittableList, sphere::Sphere, material::{Lambertian, Metal}};
+use crate::{vector3::{Point3}, hittable::HittableList, sphere::Sphere, material::{Lambertian, Metal, Dielectric}};
 
 fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
     let hit_record = &mut HitRecord::default();
@@ -61,13 +61,16 @@ fn main(){
     let mut world = HittableList::new();
 
     let material_ground = Box::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
-    let material_centre = Box::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
-    let material_left = Box::new(Metal::new(Color::new(0.8, 0.8, 0.8), 0.3));
+    let material_centre = Box::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
+    // let material_left = Box::new(Metal::new(Color::new(0.8, 0.8, 0.8), 0.3));
+    // let material_centre = Box::new(Dielectric::new(1.5));
+    let material_left = Box::new(Dielectric::new(1.5));
     let material_right = Box::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0));
 
     world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0, material_ground)));
     world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5, material_centre)));
-    world.add(Box::new(Sphere::new(Point3::new(-1.0, 0.0, -1.0), 0.5, material_left)));
+    world.add(Box::new(Sphere::new(Point3::new(-1.0, 0.0, -1.0), 0.5, material_left.clone())));
+    world.add(Box::new(Sphere::new(Point3::new(-1.0, 0.0, -1.0), -0.4, material_left)));
     world.add(Box::new(Sphere::new(Point3::new(1.0, 0.0, -1.0), 0.5, material_right)));
     // Camera
     let cam = Camera::default();
