@@ -1,9 +1,20 @@
-use crate::{ray::Ray, hittable::HitRecord, vector3::{Color, reflect, unit_vector, dot, refract}, util::{random_unit_vector, random_f64}};
+use crate::{
+    hittable::HitRecord,
+    ray::Ray,
+    util::{random_f64, random_unit_vector},
+    vector3::{dot, reflect, refract, unit_vector, Color},
+};
 use dyn_clone::DynClone;
 
 dyn_clone::clone_trait_object!(Material);
-pub trait Material: DynClone  {
-    fn scatter(&self, ray_in: Ray, hit_record: HitRecord, attenuation: &mut Color, scattered: &mut Ray) -> bool;
+pub trait Material: DynClone {
+    fn scatter(
+        &self,
+        ray_in: Ray,
+        hit_record: HitRecord,
+        attenuation: &mut Color,
+        scattered: &mut Ray,
+    ) -> bool;
 }
 
 #[derive(Clone)]
@@ -13,12 +24,18 @@ pub struct Lambertian {
 
 impl Lambertian {
     pub fn new(albedo: Color) -> Self {
-        Self {albedo}
+        Self { albedo }
     }
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, ray_in: Ray, hit_record: HitRecord, attenuation: &mut Color, scattered: &mut Ray) -> bool {
+    fn scatter(
+        &self,
+        ray_in: Ray,
+        hit_record: HitRecord,
+        attenuation: &mut Color,
+        scattered: &mut Ray,
+    ) -> bool {
         let mut scatter_direction = hit_record.normal.clone() + random_unit_vector();
         if scatter_direction.near_zero() {
             scatter_direction = hit_record.normal;
@@ -37,15 +54,24 @@ pub struct Metal {
 
 impl Metal {
     pub fn new(albedo: Color, fuzz: f64) -> Self {
-        let fuzz = if fuzz < 1.0 {fuzz} else {1.0};
-        Self {albedo, fuzz}
+        let fuzz = if fuzz < 1.0 { fuzz } else { 1.0 };
+        Self { albedo, fuzz }
     }
 }
 
 impl Material for Metal {
-    fn scatter(&self, ray_in: Ray, hit_record: HitRecord, attenuation: &mut Color, scattered: &mut Ray) -> bool {
+    fn scatter(
+        &self,
+        ray_in: Ray,
+        hit_record: HitRecord,
+        attenuation: &mut Color,
+        scattered: &mut Ray,
+    ) -> bool {
         let reflected = reflect(&unit_vector(ray_in.direction()), &hit_record.normal);
-        scattered.update_as(Ray::new(&hit_record.p, &(reflected + random_unit_vector() * self.fuzz)));
+        scattered.update_as(Ray::new(
+            &hit_record.p,
+            &(reflected + random_unit_vector() * self.fuzz),
+        ));
         attenuation.update_as(self.albedo.clone());
         dot(scattered.direction(), &hit_record.normal) > 0.0
     }
@@ -57,20 +83,30 @@ pub struct Dielectric {
 }
 
 impl Dielectric {
-    pub fn new (ir: f64) -> Self {
-        Self {ir}
+    pub fn new(ir: f64) -> Self {
+        Self { ir }
     }
 
     fn reflectance(&self, cos_theta: f64, refraction_ratio: f64) -> f64 {
         // Schlick's approximation for reflectance.
-        let r0 = (1.0-refraction_ratio) / (1.0+refraction_ratio);
+        let r0 = (1.0 - refraction_ratio) / (1.0 + refraction_ratio);
         return r0.powi(2) + (1.0 - r0.powi(2)) * (1.0 - cos_theta).powi(5);
     }
 }
 
 impl Material for Dielectric {
-    fn scatter(&self, ray_in: Ray, hit_record: HitRecord, attenuation: &mut Color, scattered: &mut Ray) -> bool {
-        let eta_ratio = if hit_record.front_face {1.0/self.ir} else {self.ir};
+    fn scatter(
+        &self,
+        ray_in: Ray,
+        hit_record: HitRecord,
+        attenuation: &mut Color,
+        scattered: &mut Ray,
+    ) -> bool {
+        let eta_ratio = if hit_record.front_face {
+            1.0 / self.ir
+        } else {
+            self.ir
+        };
         attenuation.update_as(Color::new(1.0, 1.0, 1.0));
 
         let unit_direction = unit_vector(ray_in.direction());
@@ -79,7 +115,9 @@ impl Material for Dielectric {
 
         let cannot_refract = eta_ratio * sin_theta > 1.0; // total reflection
 
-        let direction = match cannot_refract || self.reflectance(cos_theta, eta_ratio) > rand::random::<f64>() {
+        let direction = match cannot_refract
+            || self.reflectance(cos_theta, eta_ratio) > rand::random::<f64>()
+        {
             true => reflect(&unit_direction, &hit_record.normal),
             false => refract(&unit_direction, &hit_record.normal, eta_ratio),
         };

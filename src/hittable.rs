@@ -1,7 +1,7 @@
 use crate::material::Material;
-use crate::vector3::{Point3, Vec3, dot};
 use crate::ray::Ray;
 use crate::util::Interval;
+use crate::vector3::{dot, Point3, Vec3};
 
 #[derive(Clone)]
 pub struct HitRecord {
@@ -15,7 +15,11 @@ pub struct HitRecord {
 impl HitRecord {
     pub fn set_face_normal(&mut self, ray: &Ray, outward_normal: Vec3) {
         self.front_face = dot(ray.direction(), &outward_normal) < 0.0;
-        self.normal = if self.front_face {outward_normal} else {-outward_normal};
+        self.normal = if self.front_face {
+            outward_normal
+        } else {
+            -outward_normal
+        };
     }
 
     pub fn update_as(&mut self, new_record: &HitRecord) {
@@ -29,26 +33,29 @@ impl HitRecord {
 
 impl Default for HitRecord {
     fn default() -> Self {
-        Self { p: Default::default(), normal: Default::default(), material: None, t: Default::default(), front_face: Default::default() }
+        Self {
+            p: Default::default(),
+            normal: Default::default(),
+            material: None,
+            t: Default::default(),
+            front_face: Default::default(),
+        }
     }
 }
-
 
 pub trait Hittable {
     fn hit(&self, r: &Ray, ray_t: Interval, hit_rec: &mut HitRecord) -> bool;
 }
 
 pub struct HittableList {
-    objects: Vec<Box<dyn Hittable>>
+    objects: Vec<Box<dyn Hittable>>,
 }
 
 impl HittableList {
-    pub fn new() -> Self{
-        Self {
-            objects: vec![]
-        }
+    pub fn new() -> Self {
+        Self { objects: vec![] }
     }
-    
+
     pub fn add(&mut self, hittable_object: Box<dyn Hittable>) {
         self.objects.push(hittable_object);
     }
@@ -61,7 +68,7 @@ impl HittableList {
         let mut hit_anything = false;
         let mut closest_so_far = ray_t.max;
         let mut temp_rec = HitRecord::default();
-        
+
         for object in self.objects.iter() {
             if object.hit(ray, Interval::new(ray_t.min, closest_so_far), &mut temp_rec) {
                 hit_anything = true;

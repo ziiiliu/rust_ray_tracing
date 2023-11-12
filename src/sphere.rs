@@ -1,4 +1,9 @@
-use crate::{vector3::{Point3, dot}, hittable::{Hittable, HitRecord}, material::Material, util::Interval};
+use crate::{
+    hittable::{HitRecord, Hittable},
+    material::Material,
+    util::Interval,
+    vector3::{dot, Point3},
+};
 
 pub struct Sphere {
     centre: Point3,
@@ -8,7 +13,11 @@ pub struct Sphere {
 
 impl Sphere {
     pub fn new(centre: Point3, r: f64, material: Box<dyn Material>) -> Self {
-        Self { centre, radius: r, material }
+        Self {
+            centre,
+            radius: r,
+            material,
+        }
     }
 }
 
@@ -21,16 +30,16 @@ impl Hittable for Sphere {
 
         let discriminant = half_b * half_b - a * c;
         if discriminant < 0.0 {
-            return false
+            return false;
         }
         let sqrt_d = discriminant.sqrt();
 
         // Find the appropriate t value that's within the acceptable range
-        let mut root = (-half_b -sqrt_d) / a;
+        let mut root = (-half_b - sqrt_d) / a;
         if !ray_t.surrounds(root) {
-            root = (-half_b +sqrt_d) / a;
+            root = (-half_b + sqrt_d) / a;
             if !ray_t.surrounds(root) {
-                return false
+                return false;
             }
         }
 

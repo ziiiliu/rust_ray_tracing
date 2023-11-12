@@ -1,8 +1,8 @@
-use crate::vector3::{Vec3, unit_vector};
+use crate::vector3::{unit_vector, Vec3};
 
 pub const INF: f64 = f64::INFINITY;
 pub const PI: f64 = std::f64::consts::PI;
-// pub const EMPTY: Interval = Interval::new(INF, -INF); 
+// pub const EMPTY: Interval = Interval::new(INF, -INF);
 // pub const UNIVERSE: Interval = Interval::new(-INF, INF);
 
 pub fn degrees_to_radians(degrees: f64) -> f64 {
@@ -10,7 +10,7 @@ pub fn degrees_to_radians(degrees: f64) -> f64 {
 }
 
 pub fn random_f64(min: f64, max: f64) -> f64 {
-    min + rand::random::<f64>() * (max-min)
+    min + rand::random::<f64>() * (max - min)
 }
 
 pub fn random_in_unit_sphere() -> Vec3 {
@@ -18,8 +18,8 @@ pub fn random_in_unit_sphere() -> Vec3 {
         let random_p = Vec3::random(-1.0, 1.0);
         if random_p.length_squared() >= 1.0 {
             continue;
-        } 
-        return random_p
+        }
+        return random_p;
     }
 }
 
@@ -30,11 +30,9 @@ pub fn random_unit_vector() -> Vec3 {
 pub fn clamp(x: f64, min: f64, max: f64) -> f64 {
     if x < min {
         min
-    }
-    else if x > max {
+    } else if x > max {
         max
-    }
-    else {
+    } else {
         x
     }
 }
@@ -63,6 +61,9 @@ impl Interval {
 
 impl Default for Interval {
     fn default() -> Self {
-        Self { min: -INF, max: INF}
+        Self {
+            min: -INF,
+            max: INF,
+        }
     }
 }

@@ -8,15 +8,21 @@ pub struct Ray {
 
 impl Default for Ray {
     fn default() -> Self {
-        Self { origin: Default::default(), direction: Default::default() }
+        Self {
+            origin: Default::default(),
+            direction: Default::default(),
+        }
     }
 }
 
 impl Ray {
     pub fn new(origin: &Point3, direction: &Vec3) -> Self {
-        Ray { origin: origin.clone(), direction: direction.clone() }
+        Ray {
+            origin: origin.clone(),
+            direction: direction.clone(),
+        }
     }
-    
+
     pub fn origin(&self) -> &Point3 {
         &self.origin
     }
